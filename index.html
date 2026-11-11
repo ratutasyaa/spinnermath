@@ -1,0 +1,878 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MathSpin Galaxy - Music Quiz Adventure</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;700;800&display=swap');
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Nunito', sans-serif;
+    color: white;
+    background:
+        radial-gradient(circle at 15% 20%, #7354a8 0%, transparent 30%),
+        radial-gradient(circle at 85% 80%, #395c9c 0%, transparent 35%),
+        linear-gradient(135deg, #171333, #282052, #171a40);
+    overflow-x: hidden;
+}
+
+.star {
+    position: fixed;
+    color: white;
+    pointer-events: none;
+    animation: twinkle 2s infinite alternate;
+    z-index: -1;
+}
+
+@keyframes twinkle {
+    from { opacity: .2; transform: scale(.8); }
+    to { opacity: 1; transform: scale(1.2); }
+}
+
+.container {
+    width: min(950px, 92%);
+    margin: auto;
+    padding: 25px 0 50px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+h1 {
+    font-family: 'Fredoka', sans-serif;
+    font-size: clamp(38px, 7vw, 65px);
+    margin: 0;
+    color: #ffe27a;
+    text-shadow: 0 5px 0 #9b579e, 0 8px 20px #0008;
+}
+
+.subtitle {
+    color: #d9d5ff;
+    margin-top: 5px;
+}
+
+.panel {
+    background: #ffffff16;
+    border: 1px solid #ffffff35;
+    backdrop-filter: blur(12px);
+    border-radius: 25px;
+    padding: 25px;
+    box-shadow: 0 15px 40px #0004;
+    margin-bottom: 20px;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.stat {
+    background: #ffffff18;
+    padding: 10px 17px;
+    border-radius: 15px;
+    font-weight: 800;
+}
+
+button {
+    border: none;
+    border-radius: 14px;
+    padding: 12px 18px;
+    font-family: inherit;
+    font-weight: 800;
+    cursor: pointer;
+    background: #ffe27a;
+    color: #33234f;
+    transition: .2s;
+}
+
+button:hover {
+    transform: translateY(-3px);
+    filter: brightness(1.08);
+}
+
+button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.secondary {
+    background: #bba7ff;
+}
+
+.green {
+    background: #91f0c5;
+}
+
+.game-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    align-items: center;
+}
+
+.wheel-area {
+    text-align: center;
+}
+
+.wheel {
+    width: min(290px, 75vw);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    margin: 15px auto;
+    border: 9px solid #ffe27a;
+    background: conic-gradient(
+        #ff8caa 0deg 60deg,
+        #9e8cff 60deg 120deg,
+        #63d9d0 120deg 180deg,
+        #ffca70 180deg 240deg,
+        #80a9ff 240deg 300deg,
+        #dc91ff 300deg 360deg
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 0 30px #b99aff88;
+    transition: transform 3s cubic-bezier(.15,.75,.15,1);
+}
+
+.wheel::after {
+    content: "✦";
+    position: absolute;
+    background: white;
+    color: #6a4a9c;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 30px;
+    box-shadow: 0 3px 10px #0004;
+}
+
+.pointer {
+    font-size: 35px;
+    color: #ffe27a;
+    margin-bottom: -22px;
+    position: relative;
+    z-index: 2;
+}
+
+.wheel-label {
+    position: absolute;
+    font-size: 30px;
+    font-weight: 900;
+    color: white;
+    text-shadow: 0 2px 5px #333;
+}
+
+.label1 { top: 12%; left: 45%; }
+.label2 { top: 40%; right: 8%; }
+.label3 { bottom: 12%; right: 25%; }
+.label4 { bottom: 12%; left: 25%; }
+.label5 { top: 40%; left: 8%; }
+.label6 { top: 12%; left: 18%; }
+
+.question-area h2 {
+    color: #ffe27a;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 27px;
+}
+
+.question {
+    font-size: 25px;
+    font-weight: 900;
+    min-height: 75px;
+    display: flex;
+    align-items: center;
+}
+
+.answers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.answer {
+    background: #ffffff20;
+    color: white;
+    border: 2px solid #ffffff35;
+    font-size: 16px;
+}
+
+.answer.correct {
+    background: #43c995;
+    color: #123b35;
+}
+
+.answer.wrong {
+    background: #ff7895;
+    color: #542036;
+}
+
+.feedback {
+    min-height: 45px;
+    margin-top: 15px;
+    font-weight: 800;
+    font-size: 16px;
+}
+
+.progress {
+    height: 12px;
+    background: #ffffff25;
+    border-radius: 20px;
+    overflow: hidden;
+    margin: 15px 0;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #ffe27a, #ff8caa);
+    transition: .4s;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.center {
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}
+
+#result {
+    text-align: center;
+}
+
+#result h2 {
+    font-size: 38px;
+    color: #ffe27a;
+    font-family: 'Fredoka', sans-serif;
+}
+
+.big-score {
+    font-size: 65px;
+    font-weight: 900;
+    color: #91f0c5;
+}
+
+footer {
+    text-align: center;
+    color: #c9c3e9;
+    font-size: 13px;
+    margin-top: 25px;
+}
+
+@media(max-width:700px) {
+    .game-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .panel {
+        padding: 18px;
+    }
+
+    .question {
+        font-size: 21px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+    <h1>🌌 MathSpin Galaxy</h1>
+    <div class="subtitle">
+        Spin the wheel, solve the mystery, be a math star! ✨
+    </div>
+</header>
+
+<div class="panel" id="gamePanel">
+
+    <div class="topbar">
+        <div class="stat">⭐ Skor: <span id="score">0</span></div>
+        <div class="stat">🔥 Streak: <span id="streak">0</span></div>
+        <div class="stat">📝 Soal: <span id="number">1</span>/10</div>
+        <div class="stat">🚀 Level: MEDIUM</div>
+    </div>
+
+    <div class="topbar">
+        <button class="secondary" id="musicBtn" onclick="toggleMusic()">
+            🎵 Musik: OFF
+        </button>
+
+        <button class="green" id="soundBtn" onclick="toggleSound()">
+            🔊 Suara: ON
+        </button>
+    </div>
+
+    <div class="progress">
+        <div class="progress-fill" id="progress"></div>
+    </div>
+
+    <div class="game-grid">
+
+        <div class="wheel-area">
+
+            <div class="pointer">▼</div>
+
+            <div class="wheel" id="wheel">
+                <span class="wheel-label label1">+</span>
+                <span class="wheel-label label2">−</span>
+                <span class="wheel-label label3">×</span>
+                <span class="wheel-label label4">÷</span>
+                <span class="wheel-label label5">√</span>
+                <span class="wheel-label label6">π</span>
+            </div>
+
+            <button id="spinBtn" onclick="spinWheel()">
+                🎡 PUTAR RODA!
+            </button>
+
+            <p id="wheelMessage">
+                Putar roda untuk mendapatkan soal!
+            </p>
+        </div>
+
+        <div class="question-area">
+
+            <h2>🚀 Misi Matematika</h2>
+
+            <div class="question" id="question">
+                Siap memulai petualangan?
+            </div>
+
+            <div class="answers" id="answers">
+                <button class="answer" disabled>A</button>
+                <button class="answer" disabled>B</button>
+                <button class="answer" disabled>C</button>
+                <button class="answer" disabled>D</button>
+            </div>
+
+            <div class="feedback" id="feedback">
+                Klik PUTAR RODA untuk mulai!
+            </div>
+
+            <div class="controls">
+                <button class="secondary" onclick="showHint()">
+                    💡 Petunjuk
+                </button>
+
+                <button class="green" id="nextBtn"
+                    onclick="nextQuestion()" disabled>
+                    Soal Berikutnya ➜
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="panel hidden" id="result">
+
+    <h2>🎉 Misi Selesai!</h2>
+
+    <p>Petualangan matematika kamu telah berakhir.</p>
+
+    <div class="big-score" id="finalScore">0</div>
+
+    <h3 id="rank"></h3>
+    <p id="resultMessage"></p>
+
+    <button onclick="nextRound()">
+        🚀 PUTARAN BERIKUTNYA
+    </button>
+
+    <button class="secondary" onclick="restartGame()">
+        🔄 ULANG DARI AWAL
+    </button>
+</div>
+
+<footer>
+    Made with 💜 for Math Lovers | MathSpin Galaxy
+</footer>
+
+</div>
+
+<script>
+
+// =====================================
+// BANK SOAL MATEMATIKA MEDIUM
+// =====================================
+
+const questions = [
+    {q:"18 × 15 = ?",a:["250","260","270","280"],c:2,h:"18 × (10 + 5)."},
+    {q:"225 ÷ 15 = ?",a:["12","13","15","18"],c:2,h:"15 × 15 = 225."},
+    {q:"35% dari 200 = ?",a:["60","65","70","75"],c:2,h:"35/100 × 200."},
+    {q:"3/5 + 1/10 = ?",a:["5/10","6/10","7/10","8/10"],c:2,h:"Samakan penyebut menjadi 10."},
+    {q:"2⁵ + 4 = ?",a:["32","34","36","40"],c:1,h:"2⁵ = 32, lalu tambahkan 4."},
+    {q:"Luas persegi panjang 12 cm × 7 cm?",a:["72 cm²","78 cm²","84 cm²","96 cm²"],c:2,h:"Luas = panjang × lebar."},
+    {q:"x/3 + 4 = 10. Nilai x adalah?",a:["12","15","18","21"],c:2,h:"Kurangi 10 dengan 4, lalu kalikan 3."},
+    {q:"Rata-rata dari 6, 8, 10, dan 12 adalah?",a:["8","9","10","11"],c:1,h:"Jumlahkan semua data, lalu bagi 4."},
+    {q:"1,2 × 50 = ?",a:["40","50","60","70"],c:2,h:"Kalikan 1,2 dengan 50."},
+    {q:"√400 = ?",a:["15","18","20","25"],c:2,h:"20 × 20 = 400."},
+    {q:"3x − 7 = 20. Nilai x adalah?",a:["7","8","9","10"],c:2,h:"Tambahkan 7, lalu bagi 3."},
+    {q:"Perbandingan 2 : 3 memiliki jumlah 40. Bagian pertama adalah?",a:["12","14","16","20"],c:2,h:"Jumlah bagian = 5."},
+    {q:"15% dari 300 = ?",a:["35","40","45","50"],c:2,h:"15/100 × 300."},
+    {q:"Keliling lingkaran dengan r = 7 dan π = 22/7?",a:["22","44","88","154"],c:1,h:"Keliling = 2 × π × r."},
+    {q:"5² − 4² = ?",a:["7","9","11","15"],c:1,h:"25 dikurangi 16."}
+];
+
+// =====================================
+// VARIABEL PERMAINAN
+// =====================================
+
+let score = 0;
+let streak = 0;
+let current = 0;
+let round = 1;
+let selectedQuestions = [];
+let currentQuestion = null;
+let answered = false;
+let spinning = false;
+
+let musicOn = false;
+let soundOn = true;
+
+let audioContext = null;
+let melodyTimer = null;
+let melodyStep = 0;
+
+const symbols = ["+","−","×","÷","√","π"];
+
+// =====================================
+// AUDIO DAN MUSIK ORIGINAL
+// =====================================
+
+function getAudio() {
+    if (!audioContext) {
+        audioContext = new (
+            window.AudioContext ||
+            window.webkitAudioContext
+        )();
+    }
+
+    if (audioContext.state === "suspended") {
+        audioContext.resume();
+    }
+
+    return audioContext;
+}
+
+function playTone(freq, duration=.15, type="sine", volume=.07) {
+    if (!soundOn) return;
+
+    const ctx = getAudio();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = type;
+    osc.frequency.value = freq;
+
+    gain.gain.setValueAtTime(volume, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(
+        0.001,
+        ctx.currentTime + duration
+    );
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + duration);
+}
+
+function soundCorrect() {
+    playTone(523,.15);
+    setTimeout(() => playTone(659,.15),100);
+    setTimeout(() => playTone(784,.25),200);
+}
+
+function soundWrong() {
+    playTone(220,.3,"triangle");
+}
+
+function soundSpin() {
+    playTone(440,.1,"square",.04);
+}
+
+function toggleSound() {
+    soundOn = !soundOn;
+
+    document.getElementById("soundBtn").textContent =
+        soundOn ? "🔊 Suara: ON" : "🔇 Suara: OFF";
+}
+
+// Musik latar original menggunakan Web Audio API
+const melody = [
+    523,659,784,659,
+    523,392,440,523,
+    659,784,880,784,
+    659,523,440,392
+];
+
+function playMelody() {
+    if (!musicOn) return;
+
+    const note = melody[melodyStep % melody.length];
+
+    playTone(note,.24,"triangle",.035);
+
+    melodyStep++;
+
+    melodyTimer = setTimeout(playMelody,260);
+}
+
+function toggleMusic() {
+    musicOn = !musicOn;
+
+    document.getElementById("musicBtn").textContent =
+        musicOn ? "🎵 Musik: ON" : "🎵 Musik: OFF";
+
+    if (musicOn) {
+        getAudio();
+        playMelody();
+    } else {
+        clearTimeout(melodyTimer);
+    }
+}
+
+// =====================================
+// PENGACAKAN SOAL
+// =====================================
+
+function shuffleQuestions() {
+    selectedQuestions = [...questions]
+        .sort(() => Math.random() - .5)
+        .slice(0,10);
+}
+
+// =====================================
+// MEMULAI GAME
+// =====================================
+
+function startGame() {
+    score = 0;
+    streak = 0;
+    current = 0;
+    round = 1;
+
+    shuffleQuestions();
+    updateStats();
+
+    document.getElementById("result").classList.add("hidden");
+    document.getElementById("gamePanel").classList.remove("hidden");
+
+    resetQuestion();
+}
+
+function spinWheel() {
+    if (spinning || answered || current >= 10) return;
+
+    spinning = true;
+
+    const wheel = document.getElementById("wheel");
+    const spinBtn = document.getElementById("spinBtn");
+
+    spinBtn.disabled = true;
+
+    soundSpin();
+
+    const rotation = 1440 + Math.random() * 1440;
+
+    wheel.style.transform = `rotate(${rotation}deg)`;
+
+    document.getElementById("wheelMessage").textContent =
+        "✨ Roda sedang berputar...";
+
+    setTimeout(() => {
+        const randomSymbol =
+            symbols[Math.floor(Math.random()*symbols.length)];
+
+        document.getElementById("wheelMessage").textContent =
+            "Kamu mendapatkan simbol " + randomSymbol + "!";
+
+        currentQuestion = selectedQuestions[current];
+
+        showQuestion();
+
+        spinning = false;
+    },3100);
+}
+
+// =====================================
+// MENAMPILKAN SOAL
+// =====================================
+
+function showQuestion() {
+    answered = false;
+
+    document.getElementById("question").textContent =
+        currentQuestion.q;
+
+    const answers = document.getElementById("answers");
+
+    answers.innerHTML = "";
+
+    currentQuestion.a.forEach((answer,index) => {
+        const btn = document.createElement("button");
+
+        btn.className = "answer";
+
+        btn.textContent =
+            String.fromCharCode(65+index) + ". " + answer;
+
+        btn.onclick = () => checkAnswer(index,btn);
+
+        answers.appendChild(btn);
+    });
+
+    document.getElementById("feedback").textContent =
+        "Pilih jawaban yang menurutmu benar!";
+
+    document.getElementById("nextBtn").disabled = true;
+}
+
+// =====================================
+// MEMERIKSA JAWABAN
+// =====================================
+
+function checkAnswer(index,button) {
+    if (answered) return;
+
+    answered = true;
+
+    const allButtons = document.querySelectorAll(".answer");
+
+    allButtons.forEach(btn => btn.disabled = true);
+
+    if (index === currentQuestion.c) {
+
+        streak++;
+
+        score += 10 + (streak >= 3 ? 5 : 0);
+
+        button.classList.add("correct");
+
+        document.getElementById("feedback").textContent =
+            streak >= 3
+            ? "🔥 BENAR! Bonus streak +15 poin!"
+            : "🎉 BENAR! Kamu mendapatkan 10 poin!";
+
+        soundCorrect();
+
+    } else {
+
+        streak = 0;
+
+        button.classList.add("wrong");
+
+        allButtons[currentQuestion.c].classList.add("correct");
+
+        document.getElementById("feedback").textContent =
+            "Belum tepat! Jawaban yang benar: " +
+            currentQuestion.a[currentQuestion.c];
+
+        soundWrong();
+    }
+
+    updateStats();
+
+    document.getElementById("nextBtn").disabled = false;
+    document.getElementById("spinBtn").disabled = true;
+}
+
+// =====================================
+// SOAL BERIKUTNYA
+// =====================================
+
+function nextQuestion() {
+    if (!answered) return;
+
+    current++;
+
+    if (current >= 10) {
+        finishGame();
+        return;
+    }
+
+    resetQuestion();
+}
+
+function resetQuestion() {
+    answered = false;
+
+    document.getElementById("number").textContent = current + 1;
+
+    document.getElementById("question").textContent =
+        "Putar roda untuk mendapatkan soal!";
+
+    document.getElementById("answers").innerHTML = `
+        <button class="answer" disabled>A</button>
+        <button class="answer" disabled>B</button>
+        <button class="answer" disabled>C</button>
+        <button class="answer" disabled>D</button>
+    `;
+
+    document.getElementById("feedback").textContent =
+        "Siap untuk soal berikutnya?";
+
+    document.getElementById("nextBtn").disabled = true;
+    document.getElementById("spinBtn").disabled = false;
+
+    updateStats();
+}
+
+// =====================================
+// PETUNJUK
+// =====================================
+
+function showHint() {
+    if (!currentQuestion) {
+        document.getElementById("feedback").textContent =
+            "Putar roda dulu untuk mendapatkan petunjuk!";
+        return;
+    }
+
+    document.getElementById("feedback").textContent =
+        "💡 Petunjuk: " + currentQuestion.h;
+}
+
+// =====================================
+// SKOR DAN PROGRES
+// =====================================
+
+function updateStats() {
+    document.getElementById("score").textContent = score;
+    document.getElementById("streak").textContent = streak;
+    document.getElementById("number").textContent = current + 1;
+
+    document.getElementById("progress").style.width =
+        (current / 10 * 100) + "%";
+}
+
+// =====================================
+// HASIL PERMAINAN
+// =====================================
+
+function finishGame() {
+    document.getElementById("progress").style.width = "100%";
+
+    document.getElementById("spinBtn").disabled = true;
+
+    document.getElementById("gamePanel").classList.add("hidden");
+    document.getElementById("result").classList.remove("hidden");
+
+    document.getElementById("finalScore").textContent = score;
+
+    let rank;
+    let message;
+
+    if (score >= 130) {
+        rank = "🏆 GALAXY MASTER!";
+        message = "Luar biasa! Kamu adalah bintang matematika!";
+    } else if (score >= 90) {
+        rank = "🌟 SPACE EXPLORER!";
+        message = "Keren! Kamu sudah menguasai banyak soal.";
+    } else if (score >= 50) {
+        rank = "🚀 STAR LEARNER!";
+        message = "Bagus! Terus berlatih dan tingkatkan skormu.";
+    } else {
+        rank = "🌱 LITTLE ASTRONAUT!";
+        message = "Jangan menyerah! Terus belajar matematika.";
+    }
+
+    document.getElementById("rank").textContent = rank;
+    document.getElementById("resultMessage").textContent = message;
+
+    playTone(523,.2);
+    setTimeout(() => playTone(659,.2),200);
+    setTimeout(() => playTone(784,.3),400);
+}
+
+// =====================================
+// PUTARAN BERIKUTNYA
+// =====================================
+
+function nextRound() {
+    round++;
+
+    current = 0;
+    streak = 0;
+
+    shuffleQuestions();
+
+    document.getElementById("result").classList.add("hidden");
+    document.getElementById("gamePanel").classList.remove("hidden");
+
+    document.getElementById("wheel").style.transform = "rotate(0deg)";
+
+    document.getElementById("wheelMessage").textContent =
+        "Putaran " + round + "! Ayo bermain lagi!";
+
+    resetQuestion();
+}
+
+function restartGame() {
+    startGame();
+
+    document.getElementById("wheel").style.transform = "rotate(0deg)";
+
+    document.getElementById("wheelMessage").textContent =
+        "Putar roda untuk mendapatkan soal!";
+
+    window.scrollTo({top:0,behavior:"smooth"});
+}
+
+// =====================================
+// BINTANG GALAKSI
+// =====================================
+
+for (let i=0; i<45; i++) {
+    const star = document.createElement("div");
+
+    star.className = "star";
+    star.textContent = "✦";
+
+    star.style.left = Math.random()*100 + "vw";
+    star.style.top = Math.random()*100 + "vh";
+    star.style.fontSize = (8 + Math.random()*15) + "px";
+    star.style.animationDelay = Math.random()*2 + "s";
+
+    document.body.appendChild(star);
+}
+
+// MULAI GAME
+startGame();
+
+</script>
+</body>
+</html>
